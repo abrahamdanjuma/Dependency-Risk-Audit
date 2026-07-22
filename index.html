@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dependency Audit</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  if (localStorage.getItem('theme') === 'light') {
+    document.documentElement.classList.add('light');
+  }
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" type="button">// light mode</button>
+<div class="wrap">
+
+  <p class="eyebrow">Python dependency scanner</p>
+  <h1>Dependency Risk Audit</h1>
+  <p class="lede">Paste your <code>requirements.txt</code>, hit run, and get a plain-English read on which packages have known vulnerabilities or licenses worth a second look. Runs right here — nothing to install.</p>
+
+  <div class="panel">
+    <p class="panel-label">requirements.txt</p>
+    <textarea id="reqInput" placeholder="requests==2.31.0&#10;flask>=2.0&#10;django"></textarea>
+    <div class="row">
+      <label class="file-btn" for="fileInput">Upload a file instead</label>
+      <input type="file" id="fileInput" accept=".txt">
+      <span class="file-name" id="fileName"></span>
+      <button class="primary" id="runBtn" style="margin-left:auto;">Run audit</button>
+    </div>
+    <details>
+      <summary>Advanced: ignore specific vulnerability IDs</summary>
+      <textarea id="ignoreInput" placeholder="One per line, e.g. GHSA-xxxx-xxxx-xxxx or CVE-2023-12345"></textarea>
+    </details>
+    <p class="hint">Checks run against the public PyPI registry and OSV.dev. Version ranges (like <code>&gt;=2.0</code>) are checked against the latest release, not full range resolution — pin with <code>==</code> for an exact check.</p>
+  </div>
+
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span id="statusText">Checking…</span>
+  </div>
+
+  <div id="results">
+    <div class="risk-banner" id="riskBanner">
+      <div class="sweep" id="sweep"></div>
+      <p class="eyebrow">Overall risk rating</p>
+      <div class="risk-value"><span class="risk-dot"></span><span id="riskLabel">GREEN</span></div>
+      <p class="risk-sub" id="riskSub"></p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="value" id="mPackages">0</div><div class="label">Packages scanned</div></div>
+      <div class="metric"><div class="value" id="mVulns">0</div><div class="label">Vulnerabilities</div></div>
+      <div class="metric"><div class="value" id="mLicenses">0</div><div class="label">Licenses to review</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Package</th><th>Version</th><th>License</th><th>Security</th><th>Fix to</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" id="downloadBtn">Download report (.html)</button>
+      <button class="secondary" id="resetBtn">New scan</button>
+    </div>
+  </div>
+
+  <footer>
+    Licenses flagged as "review" aren't necessarily a problem — just worth reading before you ship. Vulnerability data comes from <a href="https://osv.dev" target="_blank" rel="noopener">OSV.dev</a>.
+  </footer>
+
+</div>
+
+<script src="js/constants.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/license.js"></script>
+<script src="js/pypi.js"></script>
+<script src="js/osv.js"></script>
+<script src="js/audit.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
+<script>
+  (function () {
+    var toggle = document.getElementById('themeToggle');
+    function label() {
+      var isLight = document.documentElement.classList.contains('light');
+      toggle.textContent = isLight ? '// dark mode' : '// light mode';
+    }
+    label();
+    toggle.addEventListener('click', function () {
+      var isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      label();
+    });
+  })();
+</script>
+</body>
+</html>
